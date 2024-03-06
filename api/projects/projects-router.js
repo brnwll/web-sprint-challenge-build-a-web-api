@@ -2,10 +2,7 @@ const express = require("express");
 
 const Projects = require("./projects-model");
 
-const {
-  nameDescriptionRequired,
-  completedRequired,
-} = require("./projects-middleware");
+const { requiredFields, completedRequired } = require("./projects-middleware");
 
 const router = express.Router();
 
@@ -31,7 +28,7 @@ router.get("/:id", (req, res) => {
     });
 });
 
-router.post("/", nameDescriptionRequired, (req, res) => {
+router.post("/", requiredFields, (req, res) => {
   const { name, description, completed } = req.body;
   Projects.insert({ name, description, completed })
     .then((newProject) => {
@@ -42,7 +39,7 @@ router.post("/", nameDescriptionRequired, (req, res) => {
     });
 });
 
-router.put("/:id", nameDescriptionRequired, completedRequired, (req, res) => {
+router.put("/:id", requiredFields, completedRequired, (req, res) => {
   const { name, description, completed } = req.body;
   Projects.update(req.params.id, { name, description, completed })
     .then((project) => {

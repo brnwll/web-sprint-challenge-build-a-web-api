@@ -1,5 +1,5 @@
 // add middlewares here related to projects
-function nameDescriptionRequired(req, res, next) {
+function requiredFields(req, res, next) {
   const { name, description } = req.body;
   if (!name || !description) {
     res.status(400).json({ message: "Name and description are required" });
@@ -17,4 +17,4 @@ function completedRequired(req, res, next) {
   }
 }
 
-module.exports = { nameDescriptionRequired, completedRequired };
+module.exports = { requiredFields, completedRequired };
