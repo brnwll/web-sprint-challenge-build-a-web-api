@@ -9,13 +9,15 @@ const {
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
+router.get("/", (req, res) => {
   Projects.get()
     .then((projects) => res.status(200).json(!projects ? [] : projects))
-    .catch(next);
+    .catch(() =>
+      res.status(500).json({ message: "Error retrieving projects" })
+    );
 });
 
-router.get("/:id", (req, res, next) => {
+router.get("/:id", (req, res) => {
   Projects.get(req.params.id)
     .then((project) => {
       if (!project) {
@@ -24,37 +26,38 @@ router.get("/:id", (req, res, next) => {
         res.status(200).json(project);
       }
     })
-    .catch(next);
+    .catch(() => {
+      res.status(500).json({ message: "Error retrieving project" });
+    });
 });
 
-router.post("/", nameDescriptionRequired, (req, res, next) => {
+router.post("/", nameDescriptionRequired, (req, res) => {
   const { name, description, completed } = req.body;
   Projects.insert({ name, description, completed })
     .then((newProject) => {
       res.status(201).json(newProject);
     })
-    .catch(next);
+    .catch(() => {
+      res.status(500).json({ message: "Error adding project" });
+    });
 });
 
-router.put(
-  "/:id",
-  nameDescriptionRequired,
-  completedRequired,
-  (req, res, next) => {
-    const { name, description, completed } = req.body;
-    Projects.update(req.params.id, { name, description, completed })
-      .then((project) => {
-        if (!project) {
-          res.status(404).json({ message: "Project not found" });
-        } else {
-          res.status(200).json(project);
-        }
-      })
-      .catch(next);
-  }
-);
+router.put("/:id", nameDescriptionRequired, completedRequired, (req, res) => {
+  const { name, description, completed } = req.body;
+  Projects.update(req.params.id, { name, description, completed })
+    .then((project) => {
+      if (!project) {
+        res.status(404).json({ message: "Project not found" });
+      } else {
+        res.status(200).json(project);
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Error updating project" });
+    });
+});
 
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", (req, res) => {
   Projects.remove(req.params.id)
     .then((project) => {
       if (project > 0) {
@@ -63,10 +66,12 @@ router.delete("/:id", (req, res, next) => {
         res.status(404).json({ message: "Project not found" });
       }
     })
-    .catch(next);
+    .catch(() => {
+      res.status(500).json({ message: "Error deleting project" });
+    });
 });
 
-router.get("/:id/actions", (req, res, next) => {
+router.get("/:id/actions", (req, res) => {
   Projects.getProjectActions(req.params.id)
     .then((actions) => {
       if (!actions) {
@@ -75,7 +80,9 @@ router.get("/:id/actions", (req, res, next) => {
         res.status(200).json(actions);
       }
     })
-    .catch(next);
+    .catch(() => {
+      res.status(500).json({ message: "Error retrieving actions" });
+    });
 });
 
 module.exports = router;
